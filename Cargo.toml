@@ -6,7 +6,7 @@ description = "A Rust embedded-hal(-async) driver for the M24C64 I2C EEPROM"
 documentation = "https://docs.rs/m24c64-driver"
 repository = "https://github.com/Christopher-06/m24c64-driver"
 readme = "README.md"
-categories = ["embedded", "hardware-support", "m24c64", "no-std"]
+categories = ["embedded", "hardware-support", "no-std"]
 authors = ["Christopher Kock", "Jaci Brunning"]
 
 license = "MIT"
