@@ -3,7 +3,9 @@
 
 #![doc = include_str!("../README.md")]
 
+#[cfg(feature = "sync")]
 pub mod sync;
+#[cfg(feature = "async")]
 pub mod async_variant;
 
 /// M24C64 EEPROM Driver
@@ -21,13 +23,6 @@ impl<I2C> M24C64<I2C> {
   /// # Arguments
   /// * `i2c` - I2C Interface (from the embedded-hal(-async) crate)
   /// * `e_addr` - The address set on the E pins
-  /// 
-  /// # Example
-  /// ```
-  /// use m24c64_driver::M24C64;
-  /// 
-  /// let eeprom = M24C64::new(i2c, 0);
-  /// ```
   pub fn new(i2c: I2C, e_addr: u8) -> Self {
     Self {
       i2c, e_addr,

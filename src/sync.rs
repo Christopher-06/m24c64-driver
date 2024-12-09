@@ -1,10 +1,13 @@
+use crate::M24C64;
 use embedded_hal::{delay::DelayNs, i2c};
 
-use crate::M24C64;
+#[cfg(feature = "defmt")]
+use defmt;
 
 impl<I2C, E> M24C64<I2C>
 where
     I2C: i2c::I2c<Error = E>,
+    E: i2c::Error,
 {
     fn write_raw_blocking(
         &mut self,
@@ -25,14 +28,36 @@ where
         // to report an error instead of infinitely looping.
         let mut i = 0;
         loop {
-            match self
+            let result = self
                 .i2c
-                .write(self.e_addr | 0x50, &self.cmd_buf[0..bytes.len() + 2])
-            {
-                Ok(_) => return Ok(()),
+                .write(self.e_addr | 0x50, &self.cmd_buf[0..bytes.len() + 2]);
+
+            match result {
+                Ok(_) => {
+                    #[cfg(feature = "defmt")]
+                    defmt::trace!(
+                        "[EEPROM M24C64 Unit {:b}] Writing to address {:#x} took {} tries",
+                        self.e_addr,
+                        address,
+                        i + 1
+                    );
+
+                    return Ok(());
+                }
                 Err(_) if i < 10 => (),
-                Err(e) => return Err(e),
+                Err(e) => {
+                    #[cfg(feature = "defmt")]
+                    defmt::error!(
+                        "[EEPROM M24C64 Unit {:b}] Writing to address {:#x} failed: {}",
+                        self.e_addr,
+                        address,
+                        e.kind()
+                    );
+
+                    return Err(e);
+                }
             }
+
             i += 1;
             delay.delay_ms(1)
         }
@@ -62,6 +87,14 @@ where
         data: &[u8],
         delay: &mut dyn DelayNs,
     ) -> Result<(), E> {
+        #[cfg(feature = "defmt")]
+        defmt::info!(
+            "[EEPROM M24C64 Unit {:b}] Writing to address {:#x} with {} bytes",
+            self.e_addr,
+            address,
+            data.len()
+        );
+
         // Chunk the write into pages
         let mut i = address;
         while i < (address + data.len()) {
@@ -81,6 +114,14 @@ where
     pub fn read_blocking(&mut self, address: usize, data: &mut [u8]) -> Result<(), E> {
         // No need to do this per-page
         // self.read_raw(address, data)
+
+        #[cfg(feature = "defmt")]
+        defmt::info!(
+            "[EEPROM M24C64 Unit {:b}] Reading from address {:#x} with {} bytes",
+            self.e_addr,
+            address,
+            data.len()
+        );
 
         // Chunk the read into pages
         let len = data.len();
