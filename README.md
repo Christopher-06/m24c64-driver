@@ -10,8 +10,8 @@ cargo add m24c64-driver
 ```
 
 ## Feature
-- **sync** include Synchronous Driver API (embedded-hal I2C Trait impl)
-- **async** include Asynchronous Driver API (embedded-hal-async I2C Trait impl)
+- **sync** include Synchronous Driver API (embedded-hal I2C Trait impl) [default]
+- **async** include Asynchronous Driver API (embedded-hal-async I2C Trait impl) [default]
 - **defmt** add error logging and action tracing for this crate
 
 ## Examples
