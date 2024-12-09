@@ -1,6 +1,6 @@
 [package]
 name = "m24c64-driver"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 description = "A Rust embedded-hal(-async) driver for the M24C64 I2C EEPROM"
 documentation = "https://docs.rs/m24c64-driver"
@@ -12,5 +12,25 @@ authors = ["Christopher Kock", "Jaci Brunning"]
 license = "MIT"
 
 [dependencies]
-embedded-hal = "1.0.0"
-embedded-hal-async = "1.0.0"
+defmt = { version = "^0.3", optional = true }
+embedded-hal = { version = "^1.0.0", optional = true }
+embedded-hal-async = { version = "^1.0.0", optional = true }
+
+[features]
+default = ["sync", "async", "defmt"]
+sync = ["dep:embedded-hal"]
+defmt = ["dep:defmt", "embedded-hal/defmt-03"]
+async = ["dep:embedded-hal-async"]
+
+[dev-dependencies]
+stm32f4xx-hal = { version = "0.22.1", features = ["stm32f446"] }
+panic-halt = "1.0.0"
+cortex-m-rt = "0.7"
+cortex-m = "0.7.7"
+embassy = "0.0.0"
+embassy-executor = { version = "0.6.3", features = [
+    "executor-thread",
+    "arch-cortex-m",
+] }
+embassy-stm32 = { version = "0.1.0", git = "https://github.com/embassy-rs/embassy.git", features = ["stm32f446rc", "unstable-pac", "memory-x"] }
+embassy-time = "0.3.2"
